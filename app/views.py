@@ -30,8 +30,7 @@ def upload():
     # Instantiate your form class
     form = UploadForm()
     # Validate file upload on submit
-    if form.validate_on_submit() and request.method == "post":
-        print("b")
+    if form.validate_on_submit():
         photo = form.photo.data
         filename = secure_filename(photo.filename)
         photo.save(os.path.join(
@@ -52,7 +51,6 @@ def login():
     if form.validate_on_submit():
         # Get the username and password values from the form.
         username, password = form.username.data, form.password.data
-        print(username, password)
 
         # Using your model, query database for a user based on the username
         # and password submitted. Remember you need to compare the password hash.
@@ -62,9 +60,6 @@ def login():
         user = db.session.execute(db.select(UserProfile).filter_by(username=username)).scalar_one()
         
         if check_password_hash(user.password, password):
-
-
-            print(user, user.password)
         # Gets user id, load into session
             login_user(user)
 
