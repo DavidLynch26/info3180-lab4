@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from app.forms import LoginForm, UploadForm
 from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
-from flask import render_template, request, redirect, url_for, flash, session, abort
+from flask import render_template, request, redirect, url_for, flash, session, abort, send_from_directory
 
 
 ###
@@ -16,6 +16,17 @@ from flask import render_template, request, redirect, url_for, flash, session, a
 def home():
     """Render website's home page."""
     return render_template('home.html')
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    print(filename)
+    return send_from_directory(os.path.join(os.getcwd(),app.config['UPLOAD_FOLDER']), filename)
+
+@app.route('/files')
+@login_required
+def files():
+    files = get_uploaded_images()
+    return render_template('files.html', files=files)
 
 
 @app.route('/about/')
@@ -109,3 +120,14 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+def get_uploaded_images():
+    rootdir = os.getcwd()
+    # print(rootdir)
+    images = []
+    for subdir, dirs, files in os.walk(rootdir+"/uploads"):
+        for file in files:
+            # images.append(os.path.join(subdir, file))
+            images.append(file)
+            # print(images)
+    return images[1:]
